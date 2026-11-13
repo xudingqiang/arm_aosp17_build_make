@@ -172,15 +172,10 @@ $(error Unable to determine HOST_OS from uname -sm: $(UNAME)!)
 endif
 
 # HOST_ARCH
-ifneq (,$(findstring x86_64,$(UNAME)))
-  HOST_ARCH := x86_64
+  HOST_ARCH := arm64
   HOST_2ND_ARCH := x86
   HOST_IS_64_BIT := true
-else
-ifneq (,$(findstring i686,$(UNAME))$(findstring x86,$(UNAME)))
-$(error Building on a 32-bit x86 host is not supported: $(UNAME)!)
-endif
-endif
+
 
 ifeq ($(HOST_OS),darwin)
   # Mac no longer supports 32-bit executables
@@ -383,7 +378,16 @@ HOST_OUT_ROOT := $(OUT_DIR)/host
 .KATI_READONLY := SOONG_OUT_DIR HOST_OUT_ROOT
 
 # We want to avoid two host bin directories in multilib build.
+# On arm64 hosts Soong always builds host binaries against musl libc and
+# installs them under out/host/linux_musl-<arch> (see determineBuildOS in
+# build/soong/android/arch.go, which forces BuildOS = LinuxMusl for
+# GOARCH == arm64). Align HOST_OUT/SOONG_HOST_OUT with that layout so the
+# strict SOONG_<var> consistency checks (e.g. SOONG_ZIP) pass.
+ifeq ($(HOST_ARCH),arm64)
+HOST_OUT := $(HOST_OUT_ROOT)/$(HOST_OS)_musl-$(HOST_ARCH)
+else
 HOST_OUT := $(HOST_OUT_ROOT)/$(HOST_OS)-$(HOST_PREBUILT_ARCH)
+endif
 
 # Soong now installs to the same directory as Make.
 SOONG_HOST_OUT := $(HOST_OUT)

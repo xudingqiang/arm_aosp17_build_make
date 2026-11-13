@@ -528,8 +528,8 @@ $(foreach m,$(ALL_MODULES), \
   $(eval r := $(ALL_MODULES.$(m).REQUIRED_FROM_HOST)) \
   $(if $(r), \
     $(eval r := $(call module-installed-files,$(r))) \
-    $(eval h_m := $(filter $(HOST_OUT)/%, $(ALL_MODULES.$(m).INSTALLED))) \
-    $(eval h_r := $(filter $(HOST_OUT)/%, $(r))) \
+    $(eval h_m := $(filter $(HOST_OUT_ROOT)/%, $(ALL_MODULES.$(m).INSTALLED))) \
+    $(eval h_r := $(filter $(HOST_OUT_ROOT)/%, $(r))) \
     $(eval h_r := $(filter-out $(h_m), $(h_r))) \
     $(if $(h_m), $(eval $(call add-required-deps, $(h_m),$(h_r)))) \
   ) \
@@ -590,7 +590,7 @@ $(foreach m,$(ALL_MODULES), \
       $(eval req_files := $(req_files)$(space)$(req_file))\
     )\
     $(eval req_files := $(strip $(req_files)))\
-    $(eval mod_files := $(filter $(HOST_OUT)/%, $(call module-installed-files,$(m)))) \
+    $(eval mod_files := $(filter $(HOST_OUT_ROOT)/%, $(call module-installed-files,$(m)))) \
     $(if $(mod_files),\
       $(eval $(call add-required-deps, $(mod_files),$(req_files))) \
     )\
@@ -607,7 +607,7 @@ $(foreach m,$(ALL_MODULES), \
   $(if $(req_mods), \
     $(eval req_files := )\
     $(foreach req_mod,$(req_mods), \
-      $(eval req_file := $(filter $(HOST_OUT)/%, $(call module-installed-files,$(req_mod)))) \
+      $(eval req_file := $(filter $(HOST_OUT_ROOT)/%, $(call module-installed-files,$(req_mod)))) \
       $(if $(filter true,$(ALLOW_MISSING_DEPENDENCIES)), \
         , \
         $(if $(strip $(req_file)), \
